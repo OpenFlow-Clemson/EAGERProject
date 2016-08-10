@@ -1,4 +1,1 @@
-Usage for Scripts:
-1) sh change_prefix.sh | tee -a prefix.log
-2) sh change_Prefix_back.sh | tee -a prefix.log
-
+Python Script for BGP Setting
