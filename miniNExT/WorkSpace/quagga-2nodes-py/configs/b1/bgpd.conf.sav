@@ -1,0 +1,15 @@
+! path logfile for bgpd
+log file /var/log/quagga/bgpd.log
+
+! password for telnet authetication
+password bgpuser
+
+! router bgp id and ASN
+router bgp 200
+ bgp router-id 172.0.2.2
+
+ ! configure neighbour for this router
+ neighbor 172.0.1.1 remote-as 100
+
+ ! network prefix this router will advertise
+ network 10.0.2.0/24

@@ -1,0 +1,23 @@
+Metadata-Version: 1.1
+Name: mininext
+Version: 1.1
+Summary: Extensions to Mininet (MiniNExT)
+Home-page: UNKNOWN
+Author: Brandon Schlinker
+Author-email: bschlink@usc.edu
+License: BSD
+Description: 
+                MiniNExT (MiniNet ExTended) is a layer of extensions
+                on top of the existing Mininet software package. We are working
+                to upstream some of these extensions into mainline Mininet.
+                MiniNExT is part of the PEERING project at USC, which combines
+                multiple technologies (MiniNExT, BGPMux, Transit Portal, TP at Scale)
+                to lower the barriers to Internet routing research.
+                
+Keywords: networking emulator protocol Internet OpenFlow SDN BGP Quagga containers
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: System :: Emulators
