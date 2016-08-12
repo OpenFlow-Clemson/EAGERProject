@@ -1,12 +1,12 @@
 import os
-
 import sys
+
 from mininext.cli import CLI
 
 sys.path.insert(0, os.path.abspath('..'))
 from mininext.topo import Topo as BaseTopo
 from nodes import Floodlight
-from net import MiniNExT
+from net import MiniNExTXL
 import mininet.log as log
 
 
@@ -36,8 +36,11 @@ class Topo(BaseTopo):
 
     # Add a group consisting of a controller, a switch, and a variable number of hosts
     def addIPRewriteGroup(self, name, controller=Floodlight, hosts=1, **opts):
-        self.addController(name + '-c', controller=controller)
-        self.addSwitch()
+        c = self.addController(name + 'c', controller=controller)
+        s = self.addSwitch(name + 's')
+        h = self.addHost(name + 'h')
+        #self.addLink(c, s)
+        self.addLink(s, h)
 
     # Add an autonomous system consisting of variable IP rewrite groups and a BGP router
     def addAutonomousSystem(self, name, **opts):
@@ -45,11 +48,23 @@ class Topo(BaseTopo):
 
 
 if __name__ == '__main__':
-    log.setLogLevel('info')
+    log.setLogLevel('debug')
     mytopo = Topo()
-    mytopo.addController('c0', controller=Floodlight)
-    mytopo.addController('c1', controller=Floodlight)
-    net = MiniNExT(topo=mytopo, build=True)
+    mytopo.addIPRewriteGroup('g1')
+    mytopo.addIPRewriteGroup('g2')
+    net = MiniNExTXL(topo=mytopo, build=True)
+    print '-------------------------------------------'
+    for c in net.controllers:
+        print c.intfs
+        print c.ip
+        print c.port
+        print c.IP()
+    print '-------------------------------------------'
+    print '-------------------------------------------'
+    for s in net.switches:
+        print s.intfs
+        print s.IP()
+    print '-------------------------------------------'
     net.start()
     CLI(net)
     net.stop()

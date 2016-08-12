@@ -48,7 +48,7 @@ class Floodlight(Controller):
         # Initialize the parent class.
         Controller.__init__(self, name, cdir=self.fl_root_dir,
                             command=self.command,
-                            cargs=cargs, ip=ip, **kwargs)
+                            cargs=cargs, ip=ip, port=self.openflow_port, **kwargs)
 
     def start(self):
         """Start <controller> <args> on controller.
@@ -109,11 +109,15 @@ class Floodlight(Controller):
             properties[openflow] = str(Floodlight.openflow_port + 10)
             properties[syncmanager] = str(Floodlight.sync_manager_port + 10)
 
-            # Update the class attributes so that everyone knows what ports are available now
+            # Save and update the class attributes so that everyone knows what ports are available now
             Floodlight.http_port += 10
             Floodlight.https_port += 10
             Floodlight.openflow_port += 10
             Floodlight.sync_manager_port += 10
+            self.http_port = Floodlight.http_port
+            self.https_port = Floodlight.https_port
+            self.openflow_port = Floodlight.openflow_port
+            self.sync_manager_port = Floodlight.sync_manager_port
 
             log.debug('Ports being used in controller ' + self.name + ' property file...\n')
             log.debug(http + ' = ' + properties[http] + '\n')
@@ -151,7 +155,7 @@ def installFloodlight():
         git_root_dir = git_root_dir.strip()
         subprocess.call('git clone http://github.com/floodlight/floodlight ' + git_root_dir + '/floodlight', shell=True)
         chdir(git_root_dir + '/floodlight')
-        subprocess.call('sudo mvn install', shell=True)
+        subprocess.call('sudo ant', shell=True)
         chdir(git_root_dir)
 
 

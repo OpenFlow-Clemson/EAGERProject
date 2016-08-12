@@ -1,12 +1,11 @@
 from mininext.net import MiniNExT as Mininext
 
 
-class MiniNExT(Mininext):
+class MiniNExTXL(Mininext):
     """Extended MiniNExT class that adds the ability to add controllers from a Topo class"""
 
     def buildFromTopo(self, topo=None):
-        print self.hosts
-        print '*** Adding controllers:\n'
+        print '*** Adding controllers:'
         for controllerName in topo.controllers():
             self.addController(controllerName, **topo.nodeInfo(controllerName))
             print controllerName + ' '
