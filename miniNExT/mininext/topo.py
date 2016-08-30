@@ -57,6 +57,9 @@ class Topo(BaseTopo):
            nodeConfig: a specific node's override's on service configuration
            returns: success or failure"""
 
+        import  pydevd
+        pydevd.settrace('192.168.56.1', port=8888, stdoutToServer=True, stderrToServer=True)
+
         # grab the node from our list
         nodeParams = self.nodeInfo(node)
 
