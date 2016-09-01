@@ -51,17 +51,17 @@ def startNetwork():
     sw2.start([])
 
     h1 = net.getNodeByName('h1')
-    h1.setIP('15.0.0.1/24', intf='h1-eth0')
+    h1.setIP('10.0.0.3/24', intf='h1-eth0')
     h2 = net.getNodeByName('h2')
-    h2.setIP('25.0.0.1/24', intf='h2-eth0')
+    h2.setIP('20.0.0.3/24', intf='h2-eth0')
 
     as1 = net.getNodeByName('as1')
-    as1.setIP('15.0.0.2/24', intf='as1-eth0')
-    as1.setIP('10.0.0.1/24', intf='as1-eth1')
+    as1.setIP('10.0.0.2/24', intf='as1-eth0')
+    as1.setIP('100.0.0.1/24', intf='as1-eth1')
 
     as2 = net.getNodeByName('as2')
-    as2.setIP('25.0.0.2/24', intf='as2-eth0')
-    as2.setIP('20.0.0.1/24', intf='as2-eth1')
+    as2.setIP('20.0.0.2/24', intf='as2-eth0')
+    as2.setIP('100.0.0.2/24', intf='as2-eth1')
 
     info('** Running CLI\n')
     CLI(net)

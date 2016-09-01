@@ -68,9 +68,9 @@ class QuaggaTopo(Topo):
 
         # List of Quagga host configs
         quaggaHosts = []
-        quaggaHosts.append(QuaggaHost(name='as1', ip='10.0.0.1/24',
+        quaggaHosts.append(QuaggaHost(name='as1', ip='100.0.0.1/24',
                                       loIP='1.1.1.1/24'))
-        quaggaHosts.append(QuaggaHost(name='as2', ip='20.0.0.1/24',
+        quaggaHosts.append(QuaggaHost(name='as2', ip='100.0.0.2/24',
                                       loIP='2.2.2.2/24'))
 
         # Add switches
