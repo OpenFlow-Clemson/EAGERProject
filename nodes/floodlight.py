@@ -23,8 +23,10 @@ class Floodlight(Controller):
 
     # The Floodlight folder.
     # fl_root_dir = path.join(path.abspath(path.pardir), 'floodlight/')
-    # The EAGER Floodlight folder.
+
+    # Check the EAGER Floodlight folder.
     fl_root_dir = path.join(path.abspath(path.pardir), 'EAGERFloodlight/')
+    
 
     def __init__(self, name,
                  command='java -jar ' + fl_root_dir + 'target/floodlight.jar',
