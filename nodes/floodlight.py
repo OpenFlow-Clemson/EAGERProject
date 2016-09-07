@@ -22,7 +22,9 @@ class Floodlight(Controller):
     controller_number = 0
 
     # The Floodlight folder.
-    fl_root_dir = subprocess.check_output('git rev-parse --show-toplevel', shell=True).strip() + '/floodlight/'
+    # fl_root_dir = path.join(path.abspath(path.pardir), 'floodlight/')
+    # The EAGER Floodlight folder.
+    fl_root_dir = path.join(path.abspath(path.pardir), 'EAGERFloodlight/')
 
     def __init__(self, name,
                  command='java -jar ' + fl_root_dir + 'target/floodlight.jar',
@@ -132,7 +134,7 @@ def isFloodlightInstalled():
     This is a helper function to determine whether floodlight has been installed.
     :return: true or false
     """
-    if not path.isdir('../floodlight'):
+    if not path.isdir(Floodlight.fl_root_dir):
         log.debug('Floodlight is not installed.\n')
         return False
     else:
@@ -142,17 +144,19 @@ def isFloodlightInstalled():
 
 def installFloodlight():
     """
-    Installs floodlight in the root folder of the git project.
+    Installs floodlight in the parent of the current directory.
     :return: none
     """
     if not isFloodlightInstalled():
         log.info('Installing Floodlight...\n')
-        git_root_dir = subprocess.check_output('git rev-parse --show-toplevel', shell=True)
-        git_root_dir = git_root_dir.strip()
-        subprocess.call('git clone http://github.com/floodlight/floodlight ' + git_root_dir + '/floodlight', shell=True)
-        chdir(git_root_dir + '/floodlight')
-        subprocess.call('sudo mvn install', shell=True)
-        chdir(git_root_dir)
+        # Install the vanilla Floodlight
+        #subprocess.call('git clone http://github.com/floodlight/floodlight ' + path.abspath(path.pardir) + '/floodlight', shell=True)
+        # Install the EAGER version of Floodlight
+        subprocess.call('git clone http://github.com/cbarrin/EAGERFloodlight ' + Floodlight.fl_root_dir, shell=True)
+        chdir(Floodlight.fl_root_dir)
+        subprocess.call('sudo ant', shell=True)
+        chdir(path.abspath(path.pardir))
+
 
 
 if __name__ == "__main__":

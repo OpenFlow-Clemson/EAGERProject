@@ -1,8 +1,12 @@
+import os
+import sys
+
 import mininet.log as log
 from mininet.net import Mininet
 from mininext.cli import CLI
 
-from context import nodes
+sys.path.insert(0, os.path.abspath('..'))
+import nodes
 
 if __name__ == "__main__":
     print nodes
