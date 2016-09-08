@@ -53,7 +53,7 @@ class Floodlight(Controller):
         # Initialize the parent class.
         Controller.__init__(self, name, cdir=self.fl_root_dir,
                             command=self.command,
-                            cargs=cargs, ip=ip, port=self.openflow_port, **kwargs)
+                            cargs=cargs, port=self.openflow_port, ip=ip, **kwargs)
 
     def start(self):
         """Start <controller> <args> on controller.
