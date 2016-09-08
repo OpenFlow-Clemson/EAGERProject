@@ -52,7 +52,7 @@ class Floodlight(Controller):
         # Initialize the parent class.
         Controller.__init__(self, name, cdir=self.fl_root_dir,
                             command=self.command,
-                            cargs=cargs, ip=ip, **kwargs)
+                            cargs=cargs, ip=ip, port=self.openflow_port, **kwargs)
 
     def start(self):
         """Start <controller> <args> on controller.
@@ -118,6 +118,8 @@ class Floodlight(Controller):
             Floodlight.https_port += 10
             Floodlight.openflow_port += 10
             Floodlight.sync_manager_port += 10
+
+            self.openflow_port = Floodlight.openflow_port;
 
             log.debug('Ports being used in controller ' + self.name + ' property file...\n')
             log.debug(http + ' = ' + properties[http] + '\n')
