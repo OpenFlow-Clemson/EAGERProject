@@ -45,6 +45,7 @@ class Floodlight(Controller):
         self.properties_file = ''
 
         self.createUniqueFloodlightPropertiesFile()
+        self.port = self.openflow_port
 
         # Create the command that will start Floodlight, including the path to the unique properties file.
         self.command = command + ' -cf ' + self.properties_path + self.properties_file
