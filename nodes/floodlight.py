@@ -9,6 +9,7 @@ import mininet.log as log
 from mininet.moduledeps import pathCheck
 from mininet.node import Controller
 
+from subprocess import check_output
 
 class Floodlight(Controller):
     # Port numbers used to run Floodlight. These must be unique for every instance.
@@ -23,10 +24,19 @@ class Floodlight(Controller):
 
     # The Floodlight folder.
     # fl_root_dir = path.join(path.abspath(path.pardir), 'floodlight/')
+    # fl_root_dir = path.join(path.abspath(path.pardir), 'EAGERFloodlight/')
 
-    # Check the EAGER Floodlight folder.
-    fl_root_dir = path.join(path.abspath(path.pardir), 'EAGERFloodlight/')
-    
+    # Check EAGERFloodlight folder path
+    fl_root_dir = check_output(["find", "/home/mininet", "-iname", "EAGERFloodlight", "-type", "d" ])
+
+    # Check to make sure only ONE EAGERFloodlight folder
+    if (fl_root_dir.count('\n') == 1):
+        fl_root_dir = fl_root_dir.rstrip()
+        fl_root_dir = fl_root_dir + "/"
+    else:
+        print "WARNING: Multiple EAGERFloodlight Folder exists, please remove the unnecessary one"
+        print fl_root_dir
+        exit(-1)
 
     def __init__(self, name,
                  command='java -jar ' + fl_root_dir + 'target/floodlight.jar',
@@ -65,6 +75,7 @@ class Floodlight(Controller):
         self.cmd(self.command + ' ' + self.cargs +
                  ' 1>' + cout + ' 2>' + cout + '&')
         self.execed = False
+
 
     def stop(self):
         log.debug('Removing ' + self.name + ' properties file...')
@@ -120,7 +131,7 @@ class Floodlight(Controller):
             Floodlight.openflow_port += 10
             Floodlight.sync_manager_port += 10
 
-            self.openflow_port = Floodlight.openflow_port;
+            self.openflow_port = Floodlight.openflow_port
 
             log.debug('Ports being used in controller ' + self.name + ' property file...\n')
             log.debug(http + ' = ' + properties[http] + '\n')
@@ -170,4 +181,4 @@ def installFloodlight():
 
 
 if __name__ == "__main__":
-    log.setLogLevel('info')
+    log.setLogLevel('debug')

@@ -42,17 +42,24 @@ def startNetwork():
 
     sw1 = net.getNodeByName('sw1')
     sw2 = net.getNodeByName('sw2')
-    # sw = net.getNodeByName('sw')
 
-    # Just start sw for communication b/w BGP routers
-    # sw.start([])
-    sw1.start([])
-    sw2.start([])
+    c1 = net.getNodeByName('c1')
+    c2 = net.getNodeByName('c2')
+
+    for controller in net.controllers:
+        controller.start()
+
+    sw1.start([c1])
+    sw2.start([c2])
 
     h1 = net.getNodeByName('h1')
-    h1.setIP('10.0.0.3/24', intf='h1-eth0')
+    h1.setIP('10.0.0.4/24', intf='h1-eth0')
+    h1.cmd('route add default gw 10.0.0.2')
+
+
     h2 = net.getNodeByName('h2')
-    h2.setIP('20.0.0.3/24', intf='h2-eth0')
+    h2.setIP('20.0.0.4/24', intf='h2-eth0')
+    h2.cmd('route add default gw 20.0.0.2')
 
     as1 = net.getNodeByName('as1')
     as1.setIP('10.0.0.2/24', intf='as1-eth0')
@@ -80,4 +87,4 @@ if __name__ == '__main__':
 
     # Tell mininet to print useful information
     setLogLevel('info')
-startNetwork()
+    startNetwork()

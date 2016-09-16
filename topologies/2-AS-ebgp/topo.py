@@ -76,8 +76,8 @@ class QuaggaTopo(Topo):
                                       loIP='2.2.2.2/24'))
 
         # Add switches
-        sw1 = self.addSwitch(name='sw1', dpid='0000000000000001', failMode='standalone')
-        sw2 = self.addSwitch(name='sw2', dpid='0000000000000002', failMode='standalone')
+        sw1 = self.addSwitch(name='sw1', dpid='0000000000000001', failMode='secure')
+        sw2 = self.addSwitch(name='sw2', dpid='0000000000000002', failMode='secure')
         # sw = self.addSwitch(name='sw', dpid='0000000000000003', failMode='standalone')
 
 
