@@ -38,7 +38,7 @@ class Floodlight(Controller):
             print fl_root_dir
             exit(-1)
     except subprocess.CalledProcessError:
-        fl_root_dir = '/home/vagrant/EAGERFloodlight'
+        fl_root_dir = '/home/vagrant/EAGERFloodlight/'
         print 'EAGERFloodlight does not exist yet. It should be created automatically...'
 
     def __init__(self, name,
