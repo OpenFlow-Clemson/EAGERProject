@@ -3,13 +3,13 @@ import subprocess
 from os import chdir
 from os import makedirs
 from os import path
+from subprocess import check_output
 
 import jprops
 import mininet.log as log
 from mininet.moduledeps import pathCheck
 from mininet.node import Controller
 
-from subprocess import check_output
 
 class Floodlight(Controller):
     # Port numbers used to run Floodlight. These must be unique for every instance.
@@ -27,16 +27,19 @@ class Floodlight(Controller):
     # fl_root_dir = path.join(path.abspath(path.pardir), 'EAGERFloodlight/')
 
     # Check EAGERFloodlight folder path
-    fl_root_dir = check_output(["find", "/home/mininet", "-iname", "EAGERFloodlight", "-type", "d" ])
-
-    # Check to make sure only ONE EAGERFloodlight folder
-    if (fl_root_dir.count('\n') == 1):
-        fl_root_dir = fl_root_dir.rstrip()
-        fl_root_dir = fl_root_dir + "/"
-    else:
-        print "WARNING: Multiple EAGERFloodlight Folder exists, please remove the unnecessary one"
-        print fl_root_dir
-        exit(-1)
+    try:
+        fl_root_dir = check_output(["find", "/home/mininet", "-iname", "EAGERFloodlight", "-type", "d" ])
+        # Check to make sure only ONE EAGERFloodlight folder
+        if (fl_root_dir.count('\n') == 1):
+            fl_root_dir = fl_root_dir.rstrip()
+            fl_root_dir = fl_root_dir + "/"
+        else:
+            print "WARNING: Multiple EAGERFloodlight Folder exists, please remove the unnecessary one"
+            print fl_root_dir
+            exit(-1)
+    except subprocess.CalledProcessError:
+        fl_root_dir = '/home/vagrant/EAGERFloodlight'
+        print 'EAGERFloodlight does not exist yet. It should be created automatically...'
 
     def __init__(self, name,
                  command='java -jar ' + fl_root_dir + 'target/floodlight.jar',
