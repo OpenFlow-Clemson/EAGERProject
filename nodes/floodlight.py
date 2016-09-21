@@ -143,9 +143,9 @@ class Floodlight(Controller):
             log.debug(syncmanager + ' = ' + properties[syncmanager] + '\n')
 
             # Alternate non-randomized and randomized instances of the EAGERFloodlight controller
-            random = [key for key, value in properties.items() if key.endswith('randomize-host')][0]
-            properties[random] = 'TRUE' if Floodlight.controller_number % 2 == 1 else 'FALSE'
-            log.debug(random + ' = ' + properties[random] + '\n')
+            # random = [key for key, value in properties.items() if key.endswith('randomize-host')][0]
+            # properties[random] = 'TRUE' if Floodlight.controller_number % 2 == 1 else 'FALSE'
+            # log.debug(random + ' = ' + properties[random] + '\n')
 
         # Write the updated ports to the new properties file
         with open(new_path + new_file, 'w') as fp:
