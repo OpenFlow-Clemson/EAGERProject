@@ -32,3 +32,4 @@ if __name__ == '__main__':
     for controller in net.controllers:
         controller.start()
     CLI(net)
+    net.stop()
