@@ -1,9 +1,9 @@
-import os
-import sys
 import atexit
-
 import mininet.util
 import mininext.util
+import os
+import sys
+
 mininet.util.isShellBuiltin = mininext.util.isShellBuiltin
 sys.modules['mininet.util'] = mininet.util
 
@@ -11,13 +11,11 @@ sys.path.insert(0, os.path.abspath('../..'))
 from nodes.floodlight import Floodlight
 
 from mininet.log import setLogLevel, info
-from mininet.net import Mininet
 from mininext.cli import CLI
 
 from topo import QuaggaTopo
 
 from mininext.net import MiniNExT
-from mininet.node import OVSController
 
 
 def addController():
@@ -37,6 +35,8 @@ def startNetwork():
 
     addController()
     info('\n*** Starting the network\n')
+    for hostName in net.topo.hosts():
+        print net.topo.nodeInfo(hostName)
     net.build()
     # net.start()
 

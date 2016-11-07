@@ -1,5 +1,5 @@
-import os
 import inspect
+import os
 import sys
 
 sys.path.insert(0, os.path.abspath('..'))
@@ -49,14 +49,14 @@ class Topo(BaseTopo):
         pass
 
 
-class QuaggaTopo(Topo):
+class QuaggaTopo(BaseTopo):
     """Creates a topology of Quagga routers"""
 
     def __init__(self):
         """Initialize a Quagga topology with 5 routers, configure their IP
            addresses, loop back interfaces, and paths to their private
            configuration directories."""
-        Topo.__init__(self)
+        BaseTopo.__init__(self)
 
         # Directory where this file / script is located"
         selfPath = os.path.dirname(os.path.abspath(

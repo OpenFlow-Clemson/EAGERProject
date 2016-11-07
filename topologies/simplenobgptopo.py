@@ -1,9 +1,9 @@
+import mininet.log as log
 import os
 import sys
-
-import mininet.log as log
 from mininet.cli import CLI
 from mininet.net import Mininet
+from mininet.node import RemoteController
 from mininet.topo import Topo
 
 sys.path.insert(0, os.path.abspath('..'))
@@ -24,7 +24,7 @@ class SimpleNoBGPTopo(Topo):
 if __name__ == '__main__':
     log.setLogLevel('info')
     net = Mininet(topo=SimpleNoBGPTopo(), build=False)
-    c1 = net.addController(name='c1', controller=nodes.Floodlight)
+    c1 = net.addController(name='c1', controller=RemoteController, ip='130.127.39.221', port=6653)  #nodes.Floodlight)
     c2 = net.addController(name='c2', controller=nodes.Floodlight)
     net.build()
     net.getNodeByName('s1').start([c1])
