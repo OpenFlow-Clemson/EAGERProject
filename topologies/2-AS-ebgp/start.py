@@ -1,11 +1,8 @@
-import atexit
-import mininet.util
-import mininext.util
 import os
 import sys
 
-mininet.util.isShellBuiltin = mininext.util.isShellBuiltin
-sys.modules['mininet.util'] = mininet.util
+# mininet.util.isShellBuiltin = mininext.util.isShellBuiltin
+# sys.modules['mininet.util'] = mininet.util
 
 sys.path.insert(0, os.path.abspath('../..'))
 from nodes.floodlight import Floodlight
@@ -18,33 +15,34 @@ from topo import QuaggaTopo
 from mininext.net import MiniNExT
 
 
-def addController():
-    # Adding Floodlight Controller
-    info('\n*** Adding controller\n')
-    net.addController('c1', controller=Floodlight)
-    net.addController('c2', controller=Floodlight)
+# def addController():
+
+
+# Adding Floodlight Controller
+# info('\n*** Adding controller\n')
+# net.addController('c1', controller=Floodlight)
+# net.addController('c2', controller=Floodlight)
 
 
 def startNetwork():
-
     info('\n*** Creating BGP network topology\n')
     topo = QuaggaTopo()
 
-    global net
+    # global net
     net = MiniNExT(topo=topo, build=False)
+    info(net)
+    # addController()
+    info('\n*** Adding controller\n')
+    c1 = net.addController('c1', controller=Floodlight)
+    c2 = net.addController('c2', controller=Floodlight)
 
-    addController()
     info('\n*** Starting the network\n')
     for hostName in net.topo.hosts():
         print net.topo.nodeInfo(hostName)
     net.build()
-    # net.start()
 
     sw1 = net.getNodeByName('sw1')
     sw2 = net.getNodeByName('sw2')
-
-    c1 = net.getNodeByName('c1')
-    c2 = net.getNodeByName('c2')
 
     for controller in net.controllers:
         controller.start()
@@ -55,7 +53,6 @@ def startNetwork():
     h1 = net.getNodeByName('h1')
     h1.setIP('10.0.0.4/24', intf='h1-eth0')
     h1.cmd('route add default gw 10.0.0.2')
-
 
     h2 = net.getNodeByName('h2')
     h2.setIP('20.0.0.4/24', intf='h2-eth0')
@@ -71,20 +68,9 @@ def startNetwork():
 
     info('** Running CLI\n')
     CLI(net)
-
-
-def stopNetwork():
-
-    if net is not None:
-        info('** Tearing down BGP network\n')
-        net.stop()
-
+    net.stop()
 
 if __name__ == '__main__':
-
-    # Force cleanup on exit by registering a cleanup function
-    atexit.register(stopNetwork)
-
     # Tell mininet to print useful information
     setLogLevel('info')
     startNetwork()
