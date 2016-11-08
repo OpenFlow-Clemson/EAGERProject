@@ -3,6 +3,7 @@ import subprocess
 from os import chdir
 from os import makedirs
 from os import path
+from subprocess import check_output
 
 import jprops
 import mininet.log as log
@@ -23,8 +24,22 @@ class Floodlight(Controller):
 
     # The Floodlight folder.
     # fl_root_dir = path.join(path.abspath(path.pardir), 'floodlight/')
-    # The EAGER Floodlight folder.
-    fl_root_dir = path.join(path.abspath(path.pardir), 'EAGERFloodlight/')
+    # fl_root_dir = path.join(path.abspath(path.pardir), 'EAGERFloodlight/')
+
+    # Check EAGERFloodlight folder path
+    try:
+        fl_root_dir = check_output(["find", "/home/mininet", "-iname", "EAGERFloodlight", "-type", "d" ])
+        # Check to make sure only ONE EAGERFloodlight folder
+        if (fl_root_dir.count('\n') == 1):
+            fl_root_dir = fl_root_dir.rstrip()
+            fl_root_dir = fl_root_dir + "/"
+        else:
+            print "WARNING: Multiple EAGERFloodlight Folder exists, please remove the unnecessary one"
+            print fl_root_dir
+            exit(-1)
+    except subprocess.CalledProcessError:
+        fl_root_dir = '/home/vagrant/EAGERFloodlight/'
+        print 'EAGERFloodlight does not exist yet. It should be created automatically...'
 
     def __init__(self, name,
                  command='java -jar ' + fl_root_dir + 'target/floodlight.jar',
@@ -43,6 +58,7 @@ class Floodlight(Controller):
         self.properties_file = ''
 
         self.createUniqueFloodlightPropertiesFile()
+        self.port = self.openflow_port
 
         # Create the command that will start Floodlight, including the path to the unique properties file.
         self.command = command + ' -cf ' + self.properties_path + self.properties_file
@@ -50,7 +66,7 @@ class Floodlight(Controller):
         # Initialize the parent class.
         Controller.__init__(self, name, cdir=self.fl_root_dir,
                             command=self.command,
-                            cargs=cargs, ip=ip, **kwargs)
+                            cargs=cargs, port=self.openflow_port, ip=ip, **kwargs)
 
     def start(self):
         """Start <controller> <args> on controller.
@@ -62,6 +78,7 @@ class Floodlight(Controller):
         self.cmd(self.command + ' ' + self.cargs +
                  ' 1>' + cout + ' 2>' + cout + '&')
         self.execed = False
+
 
     def stop(self):
         log.debug('Removing ' + self.name + ' properties file...')
@@ -117,11 +134,18 @@ class Floodlight(Controller):
             Floodlight.openflow_port += 10
             Floodlight.sync_manager_port += 10
 
+            self.openflow_port = Floodlight.openflow_port
+
             log.debug('Ports being used in controller ' + self.name + ' property file...\n')
             log.debug(http + ' = ' + properties[http] + '\n')
             log.debug(https + ' = ' + properties[https] + '\n')
             log.debug(openflow + ' = ' + properties[openflow] + '\n')
             log.debug(syncmanager + ' = ' + properties[syncmanager] + '\n')
+
+            # Alternate non-randomized and randomized instances of the EAGERFloodlight controller
+            # random = [key for key, value in properties.items() if key.endswith('randomize-host')][0]
+            # properties[random] = 'TRUE' if Floodlight.controller_number % 2 == 1 else 'FALSE'
+            # log.debug(random + ' = ' + properties[random] + '\n')
 
         # Write the updated ports to the new properties file
         with open(new_path + new_file, 'w') as fp:
@@ -160,4 +184,4 @@ def installFloodlight():
 
 
 if __name__ == "__main__":
-    log.setLogLevel('info')
+    log.setLogLevel('debug')
