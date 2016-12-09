@@ -28,7 +28,7 @@ class Floodlight(Controller):
 
     # Check EAGERFloodlight folder path
     try:
-        fl_root_dir = check_output(["find", "/home/mininet", "-iname", "EAGERFloodlight", "-type", "d" ])
+        fl_root_dir = check_output(["find", "/home/vagrant/", "-iname", "EAGERFloodlight", "-type", "d" ])
         # Check to make sure only ONE EAGERFloodlight folder
         if (fl_root_dir.count('\n') == 1):
             fl_root_dir = fl_root_dir.rstrip()

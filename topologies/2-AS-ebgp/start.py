@@ -1,21 +1,24 @@
-import atexit
-import mininet.util
-import mininext.util
 import os
 import sys
+import atexit
 
+import mininet.util
+import mininext.util
 mininet.util.isShellBuiltin = mininext.util.isShellBuiltin
 sys.modules['mininet.util'] = mininet.util
 
 sys.path.insert(0, os.path.abspath('../..'))
 from nodes.floodlight import Floodlight
+from nodes.bgp_router_cntl import BGPRTCntl
 
 from mininet.log import setLogLevel, info
+from mininet.net import Mininet
 from mininext.cli import CLI
 
 from topo import QuaggaTopo
 
 from mininext.net import MiniNExT
+from mininet.node import OVSController
 
 
 def addController():
@@ -35,8 +38,6 @@ def startNetwork():
 
     addController()
     info('\n*** Starting the network\n')
-    for hostName in net.topo.hosts():
-        print net.topo.nodeInfo(hostName)
     net.build()
     # net.start()
 
@@ -68,6 +69,16 @@ def startNetwork():
     as2 = net.getNodeByName('as2')
     as2.setIP('20.0.0.2/24', intf='as2-eth0')
     as2.setIP('100.0.0.2/24', intf='as2-eth1')
+
+    as1.setARP(h1.IP(), h1.MAC())
+    as2.setARP(h2.IP(), h2.MAC())
+
+    info('*** Advertising new prefixes..\n')
+    bgpController = BGPRTCntl()
+    bgpController.inject_one_prefix('as2', 200, '30.0.0.0/24')
+    bgpController.inject_one_prefix('as2', 200, '40.0.0.0/24')
+    bgpController.show_bgp_all_prefix('as2')
+    as2.cmd('route add default gw 20.0.0.4')
 
     info('** Running CLI\n')
     CLI(net)
