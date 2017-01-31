@@ -1,40 +1,108 @@
-## Vagrantfile for Clemson's EAGER MiniNExT environment.
+$init = <<SCRIPT
+  sudo aptitude update
+  sudo DEBIAN_FRONTEND=noninteractive aptitude install -y build-essential \
+   fakeroot debhelper autoconf automake libssl-dev graphviz \
+   python-all python-qt4 python-twisted-conch libtool git tmux vim python-pip python-paramiko \
+   python-sphinx ant
+  sudo pip install alabaster
+  sudo pip install requests
+  sudo pip install jprops
+  sudo pip install pytest
+SCRIPT
 
-VAGRANTFILE_API_VERSION = "2"
+$java = <<SCRIPT
+    sudo apt-get install -y software-properties-common python-software-properties
+    echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+    sudo add-apt-repository ppa:webupd8team/java -y
+    sudo apt-get update
+    sudo apt-get install oracle-java8-installer -y
+    echo "Setting environment variables for Java 8.."
+    sudo apt-get install -y oracle-java8-set-default -y
+SCRIPT
 
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  # All Vagrant configuration is done here. The most common configuration
-  # options are documented and commented below. For a complete reference,
-  # please see the online documentation at vagrantup.com.
+$ovs = <<SCRIPT
+  wget http://openvswitch.org/releases/openvswitch-2.3.2.tar.gz
+  tar xf openvswitch-2.3.2.tar.gz
+  pushd openvswitch-2.3.2
+  DEB_BUILD_OPTIONS='parallel=8 nocheck' fakeroot debian/rules binary
+  popd
+  sudo dpkg -i openvswitch-common*.deb openvswitch-datapath-dkms*.deb python-openvswitch*.deb openvswitch-pki*.deb openvswitch-switch*.deb openvswitch-controller*.deb
+  rm -rf *openvswitch*
+SCRIPT
 
-  config.vm.box = "eager-mininext.box"
+$mininet = <<SCRIPT
+  # Make sure that Mininet is uninstalled before this re-installation
+  cd ~
+  sudo rm -rf mininet
+  sudo rm -rf openflow
+  /usr/bin/yes | sudo pip uninstall mininet
+  sudo rm `which mn`
+  sudo rm `which mnexec`
+  sudo rm /usr/share/man/man1/mn.1*
+  sudo rm /usr/share/man/man1/mnexec.1*
 
-  # The url from where the 'config.vm.box' box will be fetched if it
-  # doesn't already exist on the user's system.
+  # Now re-install Mininet
+  git clone git://github.com/mininet/mininet
+  pushd mininet
+  git checkout -b 2.1.0p2 2.1.0p2
+  ./util/install.sh -fn03
+  popd
+SCRIPT
 
-  # 64 bit Vagrant Box
+$mininext = <<SCRIPT
+  # Install MiniNExT
+  sudo apt-get install -y help2man python-setuptools
+
+  git clone https://github.com/USC-NSL/miniNExT.git miniNExT/
+  cd miniNExT
+  git checkout 1.4.0
+  sudo make install
+SCRIPT
+
+$quagga = <<SCRIPT
+  # Install Quagga
+  sudo apt-get install -y quagga
+SCRIPT
+
+$floodlight = <<SCRIPT
+ # Install Floodlight
+ git clone https://www.github.com/cbarrin/EAGERFloodlight -b develop
+ pushd EAGERFloodlight
+ sudo ant
+ popd
+SCRIPT
+
+$cleanup = <<SCRIPT
+  aptitude clean
+  rm -rf /tmp/*
+SCRIPT
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "coursera-sdn-2015.box"
   config.vm.box_url = "https://d396qusza40orc.cloudfront.net/sdn1/srcs/Vagrant%20Box/coursera-sdn-2015_64bit.box"
+  ## Guest config
+  config.vm.hostname = "mininet"
+  config.vm.network :private_network, type: "dhcp"
+  config.vm.network "forwarded_port", guest: 8080, host: 8080, auto_correct: true
+  config.vm.synced_folder "./", "/home/vagrant/", create: true, group: "vagrant", owner: "vagrant"
+  
+  config.vm.provider "virtualbox" do |v|
+      v.name = "EAGER Vagrant"
+      # v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+      v.customize ["modifyvm", :id, "--memory", "2048"]
+  end
 
- ## Guest Config
- config.vm.hostname = "eager"
- config.vm.network :private_network, ip: "192.168.0.101"
- config.vm.network :forwarded_port, guest:7000, host:7001 # forwarding of port 
- 
- ## Provisioning
+  ## Provisioning
+  config.vm.provision :shell, name: "INIT", :inline => $init
+  config.vm.provision :shell, name: "JAVA", :inline => $java
+  config.vm.provision :shell, name: "OVS", :inline => $ovs
+  config.vm.provision :shell, name: "MININET", :inline => $mininet
+  config.vm.provision :shell, name: "MININEXT", :inline => $mininext
+  config.vm.provision :shell, name: "FLOODLIGHT", :inline => $floodlight
+  config.vm.provision :shell, name: "QUAGGA", :inline => $quagga
+  config.vm.provision :shell, name: "CLEANUP", :inline => $cleanup
 
- config.vm.provision :shell, privileged: false, :path => "setup/java8-setup.sh"
- config.vm.provision :shell, privileged: false, :path => "setup/mininet-setup.sh"
- config.vm.provision :shell, privileged: false, :path => "setup/sdx-setup.sh"
-
- ## SSH config
- config.ssh.forward_x11 = true
-
- ## CPU & RAM
- ## We need at least 2G to build P4, otherwise you run out of memmory 
- config.vm.provider "virtualbox" do |vb|
-    vb.customize ["modifyvm", :id, "--cpuexecutioncap", "100"]
-    vb.memory = 2048
-    vb.cpus = 1
- end
+  ## SSH config
+  config.ssh.forward_x11 = false
 
 end
