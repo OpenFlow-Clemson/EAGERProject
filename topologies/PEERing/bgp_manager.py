@@ -78,7 +78,7 @@ def main():
     # BGP manipulation on Server side
     # bgpManager.show_node_neighbor(quagga_node, '100.69.128.1')
     # bgpManager.show_adv_route(quagga_node, '100.69.128.1')
-    bgpManager.prefix_announce(quagga_node, home_ASN, peering_prefix[3])
+    #bgpManager.prefix_announce(quagga_node, home_ASN, peering_prefix[3])
     # bgpManager.show_adv_route(quagga_node, '100.69.128.1')
 
 

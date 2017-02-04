@@ -4,7 +4,7 @@ from subprocess import list2cmdline
 
 class QuaggaDriver:
     def __init__(self):
-        self.selfPath = '/home/mininet/miniNExT/util/mx'
+        self.selfPath = '/users/jzulfiq/mininet/miniNExT/util/mx'
         self.vtysh = 'vtysh -c'
 
 
