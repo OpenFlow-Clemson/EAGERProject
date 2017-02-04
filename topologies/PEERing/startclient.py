@@ -1,6 +1,6 @@
+import atexit
 import os
 import sys
-import atexit
 
 import mininet.util
 import mininext.util
@@ -17,10 +17,15 @@ from mininext.cli import CLI
 from mininet.link import Intf
 
 from clienttopo import QuaggaTopo
+from bgp_manager import bgpMgmt
 
 from mininext.net import MiniNExT
 from mininet.node import OVSController, RemoteController
 
+peering_prefix = ['184.164.240.0/24', '184.164.241.0/24', '184.164.242.0/24', '184.164.243.0/24']
+home_ASN = '47065'
+quagga_node = 'quaggaC'
+route_map = 'AMSIX'
 
 # Connects Client Side MiniNExT quagga instance to PEERing peers
 def clientConnectPEERing():
@@ -43,6 +48,10 @@ def clientConnectPEERing():
 
     h2.setIP('184.164.242.100', prefixLen=24, intf='h2-eth0')
     h2.cmd('route add default gw 184.164.242.2')
+
+    info('** Announcing BGP prefix.. \n')
+    bgpManager = bgpMgmt()
+    bgpManager.prefix_announce(quagga_node, home_ASN, peering_prefix[2])
 
 
 def startNetwork():

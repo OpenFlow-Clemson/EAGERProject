@@ -15,7 +15,7 @@ from mininet.net import Mininet
 from mininext.cli import CLI
 from mininet.link import Intf
 
-from clienttopo import QuaggaTopo
+from servertopo import QuaggaTopo
 
 from mininext.net import MiniNExT
 from mininet.node import OVSController, RemoteController
@@ -35,20 +35,20 @@ def serverConnectPEERing():
     quaggaS = net.getNodeByName('quaggaS')
     h1 = net.getNodeByName('h1')
 
-    sw1.start([])
+    #sw1.start([])
     sw2.start([])
     os.popen('ovs-vsctl add-port sw2 tap5')
     os.popen('sudo ifconfig tap5 0.0.0.0')
     sw2.setIP('0.0.0.0', intf='sw2-eth1')
 
-    quaggaS.setIP('184.164.243.2', prefixLen=24, intf='quaggaS-eth0')
-    quaggaS.setIP('184.164.243.2', prefixLen=24, intf='quaggaS-eth0')  # MiniNExT Bug here
-    quaggaS.setIP('100.69.128.6', intf='quaggaS-eth1')
+    quaggaS.setIP('10.0.0.2', prefixLen=24, intf='quaggaS-eth0')
+    quaggaS.setIP('10.0.0.2', prefixLen=24, intf='quaggaS-eth0')  # MiniNExT Bug here
+    quaggaS.setIP('100.69.128.3', intf='quaggaS-eth1')
     quaggaS.cmdPrint("ip addr add 184.164.243.1/32 dev lo")
 
 
-    h1.setIP('184.164.243.100', prefixLen=24, intf='h1-eth0')
-    h1.cmd('route add default gw 184.164.243.2')
+    h1.setIP('10.0.0.1', prefixLen=24, intf='h1-eth0')
+    h1.cmd('route add default gw 10.0.0.2')
 
 
 # Connects Client Side MiniNExT quagga instance to PEERing peers

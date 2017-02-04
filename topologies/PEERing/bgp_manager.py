@@ -3,13 +3,9 @@ import time
 
 
 peering_prefix = ['184.164.240.0/24', '184.164.241.0/24', '184.164.242.0/24', '184.164.243.0/24']
-
 home_ASN = '47065'
-
 quagga_node = 'quaggaS'
-
 quagga_node_C = 'quaggaC'
-
 route_map = 'AMSIX'
 
 class bgpMgmt:
@@ -78,12 +74,12 @@ def main():
     # BGP manipulation on Server side
     # bgpManager.show_node_neighbor(quagga_node, '100.69.128.1')
     # bgpManager.show_adv_route(quagga_node, '100.69.128.1')
-    #bgpManager.prefix_announce(quagga_node, home_ASN, peering_prefix[3])
+    # bgpManager.prefix_announce(quagga_node, home_ASN, peering_prefix[3])
     # bgpManager.show_adv_route(quagga_node, '100.69.128.1')
 
 
     # BGP manipulation on Client side
-    bgpManager.prefix_announce(quagga_node_C, home_ASN, peering_prefix[2])
+    #bgpManager.prefix_announce(quagga_node_C, home_ASN, peering_prefix[2])
 
 
 

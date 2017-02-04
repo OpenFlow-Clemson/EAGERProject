@@ -1,6 +1,6 @@
+import atexit
 import os
 import sys
-import atexit
 
 import mininet.util
 import mininext.util
@@ -17,10 +17,15 @@ from mininext.cli import CLI
 from mininet.link import Intf
 
 from servertopo import QuaggaTopo
+from bgp_manager import bgpMgmt
 
 from mininext.net import MiniNExT
 from mininet.node import OVSController, RemoteController
 
+peering_prefix = ['184.164.240.0/24', '184.164.241.0/24', '184.164.242.0/24', '184.164.243.0/24']
+home_ASN = '47065'
+quagga_node = 'quaggaS'
+route_map = 'AMSIX'
 
 # Connects Server Side MiniNExT quagga instance to PEERing peers
 def serverConnectPEERing():
@@ -30,8 +35,8 @@ def serverConnectPEERing():
     quaggaS = net.getNodeByName('quaggaS')
     h1 = net.getNodeByName('h1')
 
-    # sw1.start([])
     sw2.start([])
+
     os.popen('ovs-vsctl add-port sw2 tap5')
     os.popen('sudo ifconfig tap5 0.0.0.0')
     sw2.setIP('0.0.0.0', intf='sw2-eth1')
@@ -44,6 +49,10 @@ def serverConnectPEERing():
 
     h1.setIP('10.0.0.1', prefixLen=24, intf='h1-eth0')
     h1.cmd('route add default gw 10.0.0.2')
+
+    info('** Announcing BGP prefix.. \n')
+    bgpManager = bgpMgmt()
+    bgpManager.prefix_announce(quagga_node, home_ASN, peering_prefix[3])
 
 
 def startNetwork():
