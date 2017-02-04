@@ -15,7 +15,7 @@ from mininet.net import Mininet
 from mininext.cli import CLI
 from mininet.link import Intf
 
-from servertopo import QuaggaTopo
+from topo import QuaggaTopo
 
 from mininext.net import MiniNExT
 from mininet.node import OVSController, RemoteController
