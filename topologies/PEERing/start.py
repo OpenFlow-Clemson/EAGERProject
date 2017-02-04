@@ -15,7 +15,7 @@ from mininet.net import Mininet
 from mininext.cli import CLI
 from mininet.link import Intf
 
-from servertopo import QuaggaTopo
+from topo import QuaggaTopo
 
 from mininext.net import MiniNExT
 from mininet.node import OVSController, RemoteController
@@ -60,14 +60,14 @@ def clientConnectPEERing():
     h2 = net.getNodeByName('h2')
 
     sw3.start([])
-    sw4.start([])
+    #sw4.start([])
     os.popen('ovs-vsctl add-port sw3 tap1')
     os.popen('sudo ifconfig tap1 0.0.0.0')
     sw3.setIP('0.0.0.0', intf='sw3-eth1')
 
     quaggaC.setIP('184.164.242.2', prefixLen=24, intf='quaggaC-eth0')
     quaggaC.setIP('184.164.242.2', prefixLen=24, intf='quaggaC-eth0')
-    quaggaC.setIP('100.65.128.2', intf='quaggaC-eth1')
+    quaggaC.setIP('100.65.128.5', intf='quaggaC-eth1')
     quaggaC.cmdPrint("ip addr add 184.164.242.1/32 dev lo")
 
     h2.setIP('184.164.242.100',prefixLen=24, intf='h2-eth0')
@@ -96,7 +96,7 @@ def startNetwork():
 
     net.start()
 
-    serverConnectPEERing()
+    #serverConnectPEERing()
     clientConnectPEERing()
 
     #TODO: A ping test for each node here
