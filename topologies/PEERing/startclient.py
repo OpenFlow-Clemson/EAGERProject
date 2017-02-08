@@ -9,18 +9,17 @@ mininet.util.isShellBuiltin = mininext.util.isShellBuiltin
 sys.modules['mininet.util'] = mininet.util
 
 sys.path.insert(0, os.path.abspath('../..'))
-from nodes.floodlight import Floodlight
 
 from mininet.log import setLogLevel, info
-from mininet.net import Mininet
 from mininext.cli import CLI
-from mininet.link import Intf
 
 from clienttopo import QuaggaTopo
 from bgp_manager import bgpMgmt
 
 from mininext.net import MiniNExT
-from mininet.node import OVSController, RemoteController
+from mininet.node import RemoteController
+
+import util
 
 peering_prefix = ['184.164.240.0/24', '184.164.241.0/24', '184.164.242.0/24', '184.164.243.0/24']
 home_ASN = '47065'
@@ -37,13 +36,17 @@ def clientConnectPEERing():
 
     sw3.start([])
 
-    os.popen('ovs-vsctl add-port sw3 tap1')
-    os.popen('sudo ifconfig tap1 0.0.0.0')
+    tunnelip = util.getOpenVPNAddress()
+    tapif = util.getTapInterface()
+    prefix = util.choosePrefixToAnnounce()
+
+    os.popen('ovs-vsctl add-port sw3 ' + tapif)
+    os.popen('sudo ifconfig ' + tapif + ' 0.0.0.0')
     sw3.setIP('0.0.0.0', intf='sw3-eth1')
 
     quaggaC.setIP('184.164.242.2', prefixLen=24, intf='quaggaC-eth0')
     quaggaC.setIP('184.164.242.2', prefixLen=24, intf='quaggaC-eth0')
-    quaggaC.setIP('100.65.128.5', intf='quaggaC-eth1')
+    quaggaC.setIP(tunnelip, intf='quaggaC-eth1')
     quaggaC.cmdPrint("ip addr add 184.164.242.1/32 dev lo")
 
     h2.setIP('184.164.242.100', prefixLen=24, intf='h2-eth0')

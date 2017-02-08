@@ -1,12 +1,14 @@
-from quagga_driver import QuaggaDriver
 import time
 
+import util
+from quagga_driver import QuaggaDriver
 
 peering_prefix = ['184.164.240.0/24', '184.164.241.0/24', '184.164.242.0/24', '184.164.243.0/24']
 home_ASN = '47065'
-quagga_node = 'quaggaS'
-quagga_node_C = 'quaggaC'
+quagga_server = 'quaggaS'
+quagga_client = 'quaggaC'
 route_map = 'AMSIX'
+
 
 class bgpMgmt:
     def __init__(self):
@@ -27,7 +29,6 @@ class bgpMgmt:
         self.bgpController.show_bgp_neighbor(node, prefix)
         print '\n\n'
 
-
     def show_adv_route(self, node, prefix):
         print '>>> Display advertised routes on Node', node, '!!'
         self.bgpController.show_adv_routes(node, prefix)
@@ -39,18 +40,15 @@ class bgpMgmt:
         self.bgpController.show_recv_routes(node, prefix)
         print '\n\n'
 
-
     def show_learned_route(self, node, prefix):
         print '>>> Display learned BGP routes on Node', node, '!!'
         self.bgpController.show_learned_routes(node, prefix)
         print '\n\n'
 
-
     def show_route_map(self, node, route_map):
         print '>>> Display BGP route-map on Node', node, '!!'
         self.bgpController.show_route_map(node, route_map)
         print '\n\n'
-
 
     def prefix_announce(self, node, router_id, prefix):
         print '>>> Inject BGP prefix ', prefix, ' on Node', node, '!!'
@@ -58,7 +56,11 @@ class bgpMgmt:
         # self.bgpController.show_advertise_routes(node, prefix)
         print '\n\n'
 
-
+    def prefix_withdraw(self, node, router_id, prefix):
+        print '>>> Withdraw BGP prefix ', prefix, ' on Node', node, '!!'
+        self.bgpController.remove_one_prefix(node, router_id, prefix)
+        # self.bgpController.show_advertise_routes(node, prefix)
+        print '\n\n'
 
     # Flip bgp prefix in certain time interval
     # Can NOT Flap prefix too fast, needs to stick on one announcement for 2h
@@ -68,23 +70,65 @@ class bgpMgmt:
         self.bgpController.remove_one_prefix(node, router_id, prefix_orin)
 
 
+def chooseNode():
+    quagganodes = [quagga_client, quagga_server]
+    while True:
+        node = raw_input("\nWhich node is this? >> ")
+        util.printNumberedList(quagganodes)
+        return quagganodes[node]
+
+
+def choosePrefix():
+    while True:
+        prefix = raw_input("\nChoose a prefix >> ")
+        util.printNumberedList(peering_prefix)
+        confirm = raw_input("Are you sure you want to use prefix " + peering_prefix[prefix] + "? >> ")
+        confirm = confirm.strip().lower()
+        if confirm == "yes" or confirm == "y":
+            return peering_prefix[prefix]
+
+
+def unimplemented():
+    print("\n Feature not implemented yet. \n")
+
+
 def main():
-    bgpManager = bgpMgmt()
+    bm = bgpMgmt()
 
-    # BGP manipulation on Server side
-    # bgpManager.show_node_neighbor(quagga_node, '100.69.128.1')
-    # bgpManager.show_adv_route(quagga_node, '100.69.128.1')
-    # bgpManager.prefix_announce(quagga_node, home_ASN, peering_prefix[3])
-    # bgpManager.show_adv_route(quagga_node, '100.69.128.1')
+    node = chooseNode()
 
+    options = {'0': bm.show_node_prefix(node),
+               '1': bm.show_all_neighbors(node),
+               '2': bm.show_node_neighbor(node),
+               '3': bm.show_adv_route(node, choosePrefix()),
+               '4': bm.show_recv_route(node, choosePrefix()),
+               '5': bm.show_learned_route(node, choosePrefix()),
+               '6': unimplemented(),
+               '7': bm.prefix_announce(node, home_ASN, choosePrefix()),
+               '8': bm.prefix_withdraw(node, home_ASN, choosePrefix()),
+               '9': exit()
+               }
 
-    # BGP manipulation on Client side
-    #bgpManager.prefix_announce(quagga_node_C, home_ASN, peering_prefix[2])
+    while True:
+        print("\nBGP MANAGER")
+        print("0: Show current BGP prefix")
+        print("1: Show all BGP neighbors")
+        print("2: Show BGP neighbor")
+        print("3: Show advertised routes")
+        print("4: Show received routes")
+        print("5: Show learned routes")
+        print("6: Show BGP route map")
+        print("7: Announce BGP prefix")
+        print("8: Withdraw BGP prefix")
+        print("9: Quit")
 
+        choice = raw_input("Choose a number to run a command. What do you want to do? >> ")
 
+        try:
+            options[choice]()
+        except(KeyError):
+            print("Invalid key pressed. Choose a number 0-9!")
 
 
 if __name__ == '__main__':
     main()
-
-
