@@ -1,10 +1,11 @@
 from subprocess import call
-from subprocess import list2cmdline
+from subprocess import check_output
 
 
 class QuaggaDriver:
     def __init__(self):
-        self.selfPath = '/users/jzulfiq/miniNExT/util/mx'
+        self.path = check_output('sudo find /users/ -type d -name miniNExT', shell=True)
+        self.selfPath = self.path + '/util/mx'
         self.vtysh = 'vtysh -c'
 
 
