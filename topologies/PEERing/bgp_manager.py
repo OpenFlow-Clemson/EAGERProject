@@ -75,7 +75,7 @@ def chooseNode():
     while True:
         util.printNumberedList(quagganodes)
         node = raw_input("\nWhich node is this? >> ")
-        return quagganodes[node]
+        return quagganodes[int(node)]
 
 
 def choosePrefix():
