@@ -38,7 +38,7 @@ def serverConnectPEERing():
 
     tunnelip = util.getOpenVPNAddress()
     tapif = util.getTapInterface()
-    prefix = util.choosePrefixToAnnounce()
+    #prefix = util.choosePrefixToAnnounce()
 
     os.popen('ovs-vsctl add-port sw2 ' + tapif)
     os.popen('sudo ifconfig ' + tapif + ' 0.0.0.0')
