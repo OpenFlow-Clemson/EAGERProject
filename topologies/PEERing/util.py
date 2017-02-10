@@ -36,8 +36,8 @@ def getTapInterface():
 
 def choosePrefixToAnnounce():
     while True:
-        prefix = raw_input("\nWhich prefix do you want to announce? >> ")
         printNumberedList(peering_prefix)
+        prefix = raw_input("\nWhich prefix do you want to announce? >> ")
         confirm = raw_input("Are you sure you want to announce prefix " + peering_prefix[prefix] + "? >> ")
         confirm = confirm.strip().lower()
         if confirm == "yes" or confirm == "y":

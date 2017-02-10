@@ -73,15 +73,15 @@ class bgpMgmt:
 def chooseNode():
     quagganodes = [quagga_client, quagga_server]
     while True:
-        node = raw_input("\nWhich node is this? >> ")
         util.printNumberedList(quagganodes)
+        node = raw_input("\nWhich node is this? >> ")
         return quagganodes[node]
 
 
 def choosePrefix():
     while True:
-        prefix = raw_input("\nChoose a prefix >> ")
         util.printNumberedList(peering_prefix)
+        prefix = raw_input("\nChoose a prefix >> ")
         confirm = raw_input("Are you sure you want to use prefix " + peering_prefix[prefix] + "? >> ")
         confirm = confirm.strip().lower()
         if confirm == "yes" or confirm == "y":
