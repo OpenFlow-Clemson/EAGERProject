@@ -3,12 +3,17 @@ import subprocess
 from os import chdir
 from os import makedirs
 from os import path
+from os import listdir
 from subprocess import check_output
 
 import jprops
 import mininet.log as log
 from mininet.moduledeps import pathCheck
 from mininet.node import Controller
+from pick import pick
+
+import httplib
+import json
 
 
 class Floodlight(Controller):
@@ -22,32 +27,32 @@ class Floodlight(Controller):
     # Number of Floodlight instances created. Used for naming purposes.
     controller_number = 0
 
-    # The Floodlight folder.
-    # fl_root_dir = path.join(path.abspath(path.pardir), 'floodlight/')
-    # fl_root_dir = path.join(path.abspath(path.pardir), 'EAGERFloodlight/')
+    def listdir_fullpath(d):
+        return [path.join(d, f) for f in listdir(d)]
 
     # Check EAGERFloodlight folder path
     try:
-        fl_root_dir = check_output(["find", "/home/vagrant/", "-iname", "EAGERFloodlight", "-type", "d" ])
+        fl_options = check_output('sudo find /home/ -type d -name EAGERFloodlight', shell=True)
         # Check to make sure only ONE EAGERFloodlight folder
-        if (fl_root_dir.count('\n') == 1):
-            fl_root_dir = fl_root_dir.rstrip()
-            fl_root_dir = fl_root_dir + "/"
+        if (fl_options == ''):
+            user_title = 'Choose a directory to install Floodlight in: '
+            user_options = listdir_fullpath('/home/')
+            root_dir, index = pick(user_options, user_title)
+            fl_root_dir = root_dir + '/EAGERFloodlight'
+            installFloodlight()
         else:
-            print "WARNING: Multiple EAGERFloodlight Folder exists, please remove the unnecessary one"
-            print fl_root_dir
-            exit(-1)
+            fl_title = 'Choose which instance of Floodlight you want to run: '
+            fl_options = fl_options.split('\n')
+            fl_root_dir, index = pick(fl_options, fl_title)
     except subprocess.CalledProcessError:
-        fl_root_dir = '/home/vagrant/EAGERFloodlight/'
-        print 'EAGERFloodlight does not exist yet. It should be created automatically...'
+        print 'Something went wrong when looking for Floodlight!'
+        exit()
 
     def __init__(self, name,
-                 command='java -jar ' + fl_root_dir + 'target/floodlight.jar',
+                 command='java -jar ' + fl_root_dir + '/target/floodlight.jar',
                  cargs='',
                  ip='127.0.0.1',
                  **kwargs):
-        # Check to make sure Floodlight is installed before moving forward.
-        installFloodlight()
 
         # Increment the number of controller instances for naming purposes.
         Floodlight.controller_number += 1
@@ -79,12 +84,73 @@ class Floodlight(Controller):
                  ' 1>' + cout + ' 2>' + cout + '&')
         self.execed = False
 
-
     def stop(self):
         log.debug('Removing ' + self.name + ' properties file...')
         subprocess.call('rm ' + self.properties_path + self.properties_file, shell=True)
         super(Floodlight, self).stop()
 
+    def setRandomizeTo(self, randomize):
+        data = {
+            "randomize": str(randomize)
+        }
+        ret = self.rest_call('/wm/randomizer/config/json', data, 'POST')
+        return ret[0] == 200
+
+    def enableRandomizer(self):
+        data = {}
+        ret = self.rest_call('/wm/randomizer/module/enable/json', data, 'POST')
+        return ret[0] == 200
+
+    def disableRandomizer(self):
+        data = {}
+        ret = self.rest_call('/wm/randomizer/module/disable/json', data, 'POST')
+        return ret[0] == 200
+
+    def addServer(self, server):
+        data = {
+            "server": server
+        }
+        ret = self.rest_call('/wm/randomizer/server/add/json', data, 'POST')
+        return ret[0] == 200
+
+    def removeServer(self, server):
+        data = {
+            "server": server
+        }
+        ret = self.rest_call('/wm/randomizer/server/remove/json', data, 'POST')
+        return ret[0] == 200
+
+    def addPrefix(self, ip, mask, server):
+        data = {
+            "ip-address": ip,
+            "mask": mask,
+            "server": server
+        }
+        ret = self.rest_call('/wm/randomizer/prefix/add/json', data, 'POST')
+        return ret[0] == 200
+
+    def removePrefix(self, ip, mask, server):
+        data = {
+            "ip-address": ip,
+            "mask": mask,
+            "server": server
+        }
+        ret = self.rest_call('/wm/randomizer/prefix/remove/json', data, 'POST')
+        return ret[0] == 200
+
+    def setLanPort(self, port):
+        data = {
+            "localport": str(port)
+        }
+        ret = self.rest_call('/wm/randomizer/config/json', data, 'POST')
+        return ret[0] == 200
+
+    def setWanPort(self, port):
+        data = {
+            "wanport": str(port)
+        }
+        ret = self.rest_call('/wm/randomizer/config/json', data, 'POST')
+        return ret[0] == 200
 
     def createUniqueFloodlightPropertiesFile(self):
         """
@@ -95,7 +161,7 @@ class Floodlight(Controller):
         """
 
         # The path to the properties file to be copied and the name of the file
-        old_path = Floodlight.fl_root_dir + 'src/main/resources/'
+        old_path = Floodlight.fl_root_dir + '/src/main/resources/'
         old_file = 'floodlightdefault.properties'
 
         # The path where the new properties file will be located and the name of the file
@@ -142,15 +208,24 @@ class Floodlight(Controller):
             log.debug(openflow + ' = ' + properties[openflow] + '\n')
             log.debug(syncmanager + ' = ' + properties[syncmanager] + '\n')
 
-            # Alternate non-randomized and randomized instances of the EAGERFloodlight controller
-            # random = [key for key, value in properties.items() if key.endswith('randomize-host')][0]
-            # properties[random] = 'TRUE' if Floodlight.controller_number % 2 == 1 else 'FALSE'
-            # log.debug(random + ' = ' + properties[random] + '\n')
-
         # Write the updated ports to the new properties file
         with open(new_path + new_file, 'w') as fp:
             # print 'Writing to file ' + new_file
             jprops.store_properties(fp, properties)
+
+    def rest_call(self, path, data, action):
+        headers = {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+        }
+        body = json.dumps(data)
+        conn = httplib.HTTPConnection('127.0.0.1', self.http_port)
+        conn.request(action, path, body, headers)
+        response = conn.getresponse()
+        ret = (response.status, response.reason, response.read())
+        print ret
+        conn.close()
+        return ret
 
 
 def isFloodlightInstalled():
@@ -171,16 +246,12 @@ def installFloodlight():
     Installs floodlight in the parent of the current directory.
     :return: none
     """
-    if not isFloodlightInstalled():
-        log.info('Installing Floodlight...\n')
-        # Install the vanilla Floodlight
-        #subprocess.call('git clone http://github.com/floodlight/floodlight ' + path.abspath(path.pardir) + '/floodlight', shell=True)
-        # Install the EAGER version of Floodlight
-        subprocess.call('git clone http://github.com/cbarrin/EAGERFloodlight ' + Floodlight.fl_root_dir, shell=True)
-        chdir(Floodlight.fl_root_dir)
-        subprocess.call('sudo ant', shell=True)
-        chdir(path.abspath(path.pardir))
-
+    log.info('Installing Floodlight...\n')
+    # Install the EAGER version of Floodlight
+    subprocess.call('git clone http://github.com/cbarrin/EAGERFloodlight ' + Floodlight.fl_root_dir, shell=True)
+    chdir(Floodlight.fl_root_dir)
+    subprocess.call('sudo ant', shell=True)
+    chdir(path.abspath(path.pardir))
 
 
 if __name__ == "__main__":
