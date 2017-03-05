@@ -44,13 +44,13 @@ def clientConnectPEERing():
     os.popen('sudo ifconfig ' + tapif + ' 0.0.0.0')
     sw3.setIP('0.0.0.0', intf='sw3-eth1')
 
-    quaggaC.setIP('184.164.242.2', prefixLen=24, intf='quaggaC-eth0')
-    quaggaC.setIP('184.164.242.2', prefixLen=24, intf='quaggaC-eth0')
+    quaggaC.setIP('184.164.240.2', prefixLen=24, intf='quaggaC-eth0')
+    quaggaC.setIP('184.164.240.2', prefixLen=24, intf='quaggaC-eth0')
     quaggaC.setIP(tunnelip, intf='quaggaC-eth1')
-    quaggaC.cmdPrint("ip addr add 184.164.242.1/32 dev lo")
+    quaggaC.cmdPrint("ip addr add 184.164.240.1/32 dev lo")
 
-    h2.setIP('184.164.242.100', prefixLen=24, intf='h2-eth0')
-    h2.cmd('route add default gw 184.164.242.2')
+    h2.setIP('184.164.240.100', prefixLen=24, intf='h2-eth0')
+    h2.cmd('route add default gw 184.164.240.2')
 
     info('** Announcing BGP prefix.. \n')
     bgpManager = bgpMgmt()

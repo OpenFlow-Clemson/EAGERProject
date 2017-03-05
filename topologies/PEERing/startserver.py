@@ -48,8 +48,8 @@ def serverConnectPEERing():
     quaggaS.setIP('10.0.0.2', prefixLen=24, intf='quaggaS-eth0')  # MiniNExT Bug here
     quaggaS.setIP(tunnelip, intf='quaggaS-eth1')
     # quaggaS.cmdPrint("ip addr add 184.164.243.1/32 dev lo")
-    quaggaS.cmdPrint("route add -net 184.164.240.0 netmask 255.255.255.0 quaggaS-eth0")
     quaggaS.cmdPrint("route add -net 184.164.241.0 netmask 255.255.255.0 quaggaS-eth0")
+    quaggaS.cmdPrint("route add -net 184.164.242.0 netmask 255.255.255.0 quaggaS-eth0")
     quaggaS.cmdPrint("route add -net 184.164.243.0 netmask 255.255.255.0 quaggaS-eth0")
 
     h1.setIP('10.0.0.1', prefixLen=24, intf='h1-eth0')
