@@ -12,9 +12,6 @@ from mininet.moduledeps import pathCheck
 from mininet.node import Controller
 from pick import pick
 
-import httplib
-import json
-
 
 class Floodlight(Controller):
     # Port numbers used to run Floodlight. These must be unique for every instance.
@@ -89,69 +86,6 @@ class Floodlight(Controller):
         subprocess.call('rm ' + self.properties_path + self.properties_file, shell=True)
         super(Floodlight, self).stop()
 
-    def setRandomizeTo(self, randomize):
-        data = {
-            "randomize": str(randomize)
-        }
-        ret = self.rest_call('/wm/randomizer/config/json', data, 'POST')
-        return ret[0] == 200
-
-    def enableRandomizer(self):
-        data = {}
-        ret = self.rest_call('/wm/randomizer/module/enable/json', data, 'POST')
-        return ret[0] == 200
-
-    def disableRandomizer(self):
-        data = {}
-        ret = self.rest_call('/wm/randomizer/module/disable/json', data, 'POST')
-        return ret[0] == 200
-
-    def addServer(self, server):
-        data = {
-            "server": server
-        }
-        ret = self.rest_call('/wm/randomizer/server/add/json', data, 'POST')
-        return ret[0] == 200
-
-    def removeServer(self, server):
-        data = {
-            "server": server
-        }
-        ret = self.rest_call('/wm/randomizer/server/remove/json', data, 'POST')
-        return ret[0] == 200
-
-    def addPrefix(self, ip, mask, server):
-        data = {
-            "ip-address": ip,
-            "mask": mask,
-            "server": server
-        }
-        ret = self.rest_call('/wm/randomizer/prefix/add/json', data, 'POST')
-        return ret[0] == 200
-
-    def removePrefix(self, ip, mask, server):
-        data = {
-            "ip-address": ip,
-            "mask": mask,
-            "server": server
-        }
-        ret = self.rest_call('/wm/randomizer/prefix/remove/json', data, 'POST')
-        return ret[0] == 200
-
-    def setLanPort(self, port):
-        data = {
-            "localport": str(port)
-        }
-        ret = self.rest_call('/wm/randomizer/config/json', data, 'POST')
-        return ret[0] == 200
-
-    def setWanPort(self, port):
-        data = {
-            "wanport": str(port)
-        }
-        ret = self.rest_call('/wm/randomizer/config/json', data, 'POST')
-        return ret[0] == 200
-
     def createUniqueFloodlightPropertiesFile(self):
         """
         Creates a unique properties file for the particular Floodlight instance.
@@ -165,7 +99,7 @@ class Floodlight(Controller):
         old_file = 'floodlightdefault.properties'
 
         # The path where the new properties file will be located and the name of the file
-        new_path = Floodlight.fl_root_dir + 'properties/'
+        new_path = Floodlight.fl_root_dir + '/properties/'
         new_file = 'floodlight' + str(Floodlight.controller_number) + '.properties'
 
         # Set the instance attributes so that the instance can know where its associated properties file is
@@ -200,6 +134,7 @@ class Floodlight(Controller):
             Floodlight.openflow_port += 10
             Floodlight.sync_manager_port += 10
 
+            self.http_port = Floodlight.http_port
             self.openflow_port = Floodlight.openflow_port
 
             log.debug('Ports being used in controller ' + self.name + ' property file...\n')
@@ -212,20 +147,6 @@ class Floodlight(Controller):
         with open(new_path + new_file, 'w') as fp:
             # print 'Writing to file ' + new_file
             jprops.store_properties(fp, properties)
-
-    def rest_call(self, path, data, action):
-        headers = {
-            'Content-type': 'application/json',
-            'Accept': 'application/json',
-        }
-        body = json.dumps(data)
-        conn = httplib.HTTPConnection('127.0.0.1', self.http_port)
-        conn.request(action, path, body, headers)
-        response = conn.getresponse()
-        ret = (response.status, response.reason, response.read())
-        print ret
-        conn.close()
-        return ret
 
 
 def isFloodlightInstalled():

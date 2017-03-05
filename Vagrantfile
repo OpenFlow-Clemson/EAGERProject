@@ -52,7 +52,6 @@ SCRIPT
 $mininext = <<SCRIPT
   # Install MiniNExT
   sudo apt-get install -y help2man python-setuptools
-
   git clone https://github.com/USC-NSL/miniNExT.git miniNExT/
   cd miniNExT
   git checkout 1.4.0
