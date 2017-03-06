@@ -54,7 +54,7 @@ def clientConnectPEERing():
 
     info('** Announcing BGP prefix.. \n')
     bgpManager = bgpMgmt()
-    bgpManager.prefix_announce(quagga_node, home_ASN, peering_prefix[2])
+    bgpManager.prefix_announce(quagga_node, home_ASN, peering_prefix[0])
 
 
 def startNetwork():

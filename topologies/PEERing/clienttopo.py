@@ -6,7 +6,6 @@ sys.path.insert(0, os.path.abspath('..'))
 
 
 from mininext.topo import Topo as BaseTopo
-from nodes import Floodlight
 
 from mininext.services.quagga import QuaggaService
 from collections import namedtuple
@@ -40,9 +39,9 @@ class Topo(BaseTopo):
         return [n for n in self.nodes(sort) if not self.isSwitch(n) and not self.isController(n)]
 
     # Add a group consisting of a controller, a switch, and a variable number of hosts
-    def addIPRewriteGroup(self, name, controller=Floodlight, hosts=1, **opts):
-        self.addController(name + '-c', controller=controller)
-        self.addSwitch()
+    # def addIPRewriteGroup(self, name, controller=Floodlight, hosts=1, **opts):
+    #     self.addController(name + '-c', controller=controller)
+    #     self.addSwitch()
 
     # Add an autonomous system consisting of variable IP rewrite groups and a BGP router
     def addAutonomousSystem(self, name, **opts):
