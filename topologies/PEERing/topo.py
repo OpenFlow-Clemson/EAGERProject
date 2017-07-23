@@ -84,11 +84,11 @@ class QuaggaTopo(Topo):
         sw2 = self.addSwitch(name='sw2', dpid='0000000000000002', failMode='standalone')    # This switch talks to PEERing
         # Switch on Client Side
         sw3 = self.addSwitch(name='sw3', dpid='0000000000000003', failMode='standalone')    # This switch talks to PEERing
-        #sw4 = self.addSwitch(name='sw4', dpid='0000000000000004', failMode='standalone')    # This switch talks to Client
+        sw4 = self.addSwitch(name='sw4', dpid='0000000000000004', failMode='standalone')    # This switch talks to Client
 
         # Add Links b/w host and OVS switch
         self.addLink(h1, sw1)
-        #self.addLink(h2, sw4)
+        self.addLink(h2, sw4)
 
         # Setup each Quagga router, add link between Routers
         quaggaContainerList = []
@@ -118,6 +118,6 @@ class QuaggaTopo(Topo):
         self.addLink(sw1, quaggaContainerList[0])
         self.addLink(sw2, quaggaContainerList[0])
         # self.addLink(h2, quaggaContainerList[1])
-        #self.addLink(sw4, quaggaContainerList[1])
+        self.addLink(sw4, quaggaContainerList[1])
         self.addLink(sw3, quaggaContainerList[1])
 

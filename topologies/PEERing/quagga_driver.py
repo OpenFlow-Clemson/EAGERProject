@@ -4,7 +4,7 @@ from subprocess import list2cmdline
 
 class QuaggaDriver:
     def __init__(self):
-        self.selfPath = '/users/jzulfiq/miniNExT/util/mx'
+        self.selfPath = '/home/mininet/miniNExT/util/mx'
         self.vtysh = 'vtysh -c'
 
 
@@ -109,7 +109,7 @@ class QuaggaDriver:
 
 def main():
     bgpTest = QuaggaDriver()
-    bgpTest.show_bgp_neighbors('a1')
+    # bgpTest.show_bgp_neighbors('a1')
     # bgpTest.adjust_timer('a1', 100, 200, 300)
     # bgpTest.inject_one_prefix('a1', 100, '10.0.5.0/24')
 

@@ -72,23 +72,16 @@ class QuaggaTopo(Topo):
         quaggaHosts = []
         quaggaHosts.append(QuaggaHost(name='quaggaS', ip='100.0.0.1/24',
                                       loIP='1.1.1.1/24'))
-        #quaggaHosts.append(QuaggaHost(name='quaggaC', ip='200.0.0.1/24',
-        #                              loIP='2.2.2.2/24'))
 
-        # Add Hosts, h1 is Server, h2 is Client
-        h1 = self.addHost('h1')
-        #h2 = self.addHost('h2')
+        # Add server host
+        server = self.addHost('server')
 
         # Switch on Server Side
-        sw1 = self.addSwitch(name='sw1', dpid='0000000000000001', failMode='secure')    # This switch talks to Server
-        sw2 = self.addSwitch(name='sw2', dpid='0000000000000002', failMode='standalone')    # This switch talks to PEERing
-        # Switch on Client Side
-        #sw3 = self.addSwitch(name='sw3', dpid='0000000000000003', failMode='standalone')    # This switch talks to PEERing
-        #sw4 = self.addSwitch(name='sw4', dpid='0000000000000004', failMode='standalone')    # This switch talks to Client
+        sw_server = self.addSwitch(name='sw1', dpid='0000000000000001', failMode='standalone')     # This switch talks to Server
+        sw_peering = self.addSwitch(name='sw2', dpid='0000000000000002', failMode='standalone')    # This switch talks to PEERing
 
         # Add Links b/w host and OVS switch
-        self.addLink(h1, sw1)
-        #self.addLink(h2, sw4)
+        self.addLink(server, sw_server)
 
         # Setup each Quagga router, add link between Routers
         quaggaContainerList = []
@@ -115,9 +108,6 @@ class QuaggaTopo(Topo):
             quaggaContainerList.append(quaggaContainer)
 
         # Add Link b/w quagga Router & OVS switch
-        self.addLink(sw1, quaggaContainerList[0])
-        self.addLink(sw2, quaggaContainerList[0])
-        # self.addLink(h2, quaggaContainerList[1])
-        #self.addLink(sw4, quaggaContainerList[1])
-        #self.addLink(sw3, quaggaContainerList[1])
+        self.addLink(sw_server, quaggaContainerList[0])
+        self.addLink(sw_peering, quaggaContainerList[0])
 
