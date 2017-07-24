@@ -50,11 +50,14 @@ def serverConnectPEERing():
     sw_server = net.getNodeByName('sw1')
     quaggaS = net.getNodeByName('quaggaS')
     server = net.getNodeByName('server')
-    # c1 = net.getNodeByName('c1')
-    #
-    # for controller in net.controllers:
-    #     controller.start()
-    sw_server.start([])
+
+    # Controller setup
+    c1 = net.getNodeByName('c1')
+    for controller in net.controllers:
+        controller.start()
+    sw_server.start([c1])
+
+    # sw_server.start([])
 
 
     # PEERING setup
@@ -92,8 +95,8 @@ def startNetwork():
 
     info('\n*** Starting the network\n')
     info('\n*** Adding controller\n')
-    net.addController('c1', controller=RemoteController, port=6653)
-    # net.addController('c1', controller=Floodlight)
+    # net.addController('c1', controller=RemoteController, port=6653)
+    net.addController('c1', controller=Floodlight)
 
     net.build()
     net.start()
@@ -115,5 +118,5 @@ if __name__ == '__main__':
     atexit.register(stopNetwork)
 
     # Tell mininet to print useful information
-    setLogLevel('info')
+    setLogLevel('debug')
     startNetwork()
