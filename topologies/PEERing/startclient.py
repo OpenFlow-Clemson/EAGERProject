@@ -49,12 +49,15 @@ def clientConnectPEERing():
     sw_client = net.getNodeByName('sw4')
     quaggaC = net.getNodeByName('quaggaC')
     client = net.getNodeByName('client')
-    # c2 = net.getNodeByName('c2')
-    # sw_peering.start([])
-    #
-    # for controller in net.controllers:
-    #     controller.start()
-    sw_client.start([])
+    sw_peering.start([])
+
+
+    # Controller setup
+    c2 = net.getNodeByName('c2')
+    for controller in net.controllers:
+        controller.start()
+    sw_client.start([c2])
+
 
     # PEERING Setup
     cmd1 = 'ovs-vsctl add-port ' + ovs_peering_quagga + ' ' + openvpn_tap_device
@@ -88,11 +91,9 @@ def startNetwork():
 
     info('\n*** Starting the network\n')
     info('\n*** Adding controller\n')
-    net.addController('c2', controller=RemoteController, port=6653)
-    # net.addController('c2', controller=Floodlight)
+    net.addController('c2', controller=Floodlight)
 
     net.build()
-    net.start()
 
     clientConnectPEERing()
 

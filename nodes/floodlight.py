@@ -89,12 +89,6 @@ class Floodlight(Controller):
     def stop(self):
         log.debug('Removing ' + self.name + ' properties file...')
         subprocess.call('rm ' + self.properties_path + self.properties_file, shell=True)
-
-        print ">>>>> print command"
-        print self.command
-
-        print ">>>>> print floodlight string representation"
-        print self.__repr__()
         super(Floodlight, self).stop()
 
     def setRandomizeTo(self, randomize):
