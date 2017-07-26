@@ -21,8 +21,10 @@ from bgp_manager import bgpMgmt
 from mininext.net import MiniNExT
 
 
+# global PEERING testbed parameters
 home_ASN = '47065'
 peering_prefix = ['184.164.240.0/24', '184.164.241.0/24', '184.164.242.0/24', '184.164.243.0/24']
+
 
 # Connects Server Side MiniNExT Quagga instance to PEERing peers
 def serverConnectPEERing():
