@@ -77,7 +77,7 @@ class Floodlight(Controller):
 
     def start(self):
         """Start <controller> <args> on controller.
-           Log to /tmp/cN.log"""
+           Log to /tmp/cN.log (i.e /tmp/c1.log or /tmp/c2.log)"""
         log.info('Starting controller...\n')
         pathCheck(self.command)
         cout = '/tmp/' + self.name + '.log'
