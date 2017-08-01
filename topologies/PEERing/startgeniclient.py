@@ -12,25 +12,23 @@ sys.path.insert(0, os.path.abspath('../..'))
 from nodes.floodlight import Floodlight
 
 from mininet.log import setLogLevel, info
-from mininet.net import Mininet
 from mininext.cli import CLI
-from mininet.link import Intf
 
 from clienttopo import QuaggaTopo
 from bgp_manager import bgpMgmt
 
 from mininext.net import MiniNExT
-from mininet.node import OVSController, RemoteController
+from mininet.node import RemoteController
 
+import util
 
-# Client-side Global Parameters for PEERING setup
+# Client-side global parameters for PEERING setup
 quagga_node = 'quaggaC'
 openvpn_tap_device = "tap1"
 openvpn_tap_ip = '100.65.128.5'
 ovs_peering_quagga = 'sw3'
 
-
-# Client-side routing parameters for end-to-end  communication
+# Client-side routing parameters for end-to-end communication
 home_ASN = '47065'
 peering_prefix = ['184.164.240.0/24', '184.164.241.0/24', '184.164.242.0/24', '184.164.243.0/24']
 announce_prefix = peering_prefix[2]
@@ -59,13 +57,16 @@ def clientConnectPEERing():
     sw_client.start([c2])
 
 
-    # PEERING Setup
-    cmd1 = 'ovs-vsctl add-port ' + ovs_peering_quagga + ' ' + openvpn_tap_device
+    # PEERING setup
+    tunnelip = util.getOpenVPNAddress()
+    tapif = util.getTapInterface()
+
+    cmd1 = 'ovs-vsctl add-port ' + ovs_peering_quagga + ' ' + tapif
     os.popen(cmd1)
-    cmd2 = 'sudo ifconfig ' + openvpn_tap_device + ' 0.0.0.0'
+    cmd2 = 'sudo ifconfig ' + tapif + ' 0.0.0.0'
     os.popen(cmd2)
     sw_peering.setIP('0.0.0.0', intf='sw3-eth1')
-    quaggaC.setIP(openvpn_tap_ip, intf='quaggaC-eth1')
+    quaggaC.setIP(tunnelip, intf='quaggaC-eth1')
 
     # End-to-end communication setup
     quaggaC.setIP(quaggaC_facing_client, prefixLen=24, intf='quaggaC-eth0')
@@ -92,8 +93,9 @@ def startNetwork():
     info('\n*** Starting the network\n')
     info('\n*** Adding controller\n')
     net.addController('c2', controller=Floodlight)
-
+    # net.addController('c2', controller=RemoteController, port=6653)
     net.build()
+    # net.start()
 
     clientConnectPEERing()
 
